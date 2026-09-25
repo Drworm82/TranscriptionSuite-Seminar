@@ -84,17 +84,17 @@ const STATE_COLORS: Record<TrayState, RGB | null> = {
 const MIC_LUMINANCE_THRESHOLD = 190;
 
 const STATE_TOOLTIP_MAP: Record<TrayState, string> = {
-  idle: 'TranscriptionSuite — Ready',
-  recording: 'TranscriptionSuite — Recording',
-  processing: 'TranscriptionSuite — Processing…',
-  complete: 'TranscriptionSuite — Complete',
-  'live-active': 'TranscriptionSuite — Live Mode',
-  'recording-muted': 'TranscriptionSuite — Recording (Muted)',
-  'live-muted': 'TranscriptionSuite — Live Mode (Muted)',
-  uploading: 'TranscriptionSuite — Uploading…',
-  'models-unloaded': 'TranscriptionSuite — Models Unloaded',
-  error: 'TranscriptionSuite — Error',
-  disconnected: 'TranscriptionSuite — Disconnected',
+  idle: 'TranscriptionSuite Seminar — Ready',
+  recording: 'TranscriptionSuite Seminar — Recording',
+  processing: 'TranscriptionSuite Seminar — Processing…',
+  complete: 'TranscriptionSuite Seminar — Complete',
+  'live-active': 'TranscriptionSuite Seminar — Live Mode',
+  'recording-muted': 'TranscriptionSuite Seminar — Recording (Muted)',
+  'live-muted': 'TranscriptionSuite Seminar — Live Mode (Muted)',
+  uploading: 'TranscriptionSuite Seminar — Uploading…',
+  'models-unloaded': 'TranscriptionSuite Seminar — Models Unloaded',
+  error: 'TranscriptionSuite Seminar — Error',
+  disconnected: 'TranscriptionSuite Seminar — Disconnected',
 };
 
 // ─── TrayManager Class ──────────────────────────────────────────────────────

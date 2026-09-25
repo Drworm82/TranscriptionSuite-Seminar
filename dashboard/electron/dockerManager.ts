@@ -1527,7 +1527,7 @@ export function composeFileArgs(
   // vulkan-wsl2: whisper-server.exe runs natively on Windows (no AVX2 in the
   // host CPU means the containerised whisper-server cannot start).  Docker only
   // handles the main transcription backend; it reaches the native exe via
-  // host.docker.internal:8081.  No sidecar overlay needed.
+  // The Seminar backend reaches the native Whisper.cpp server through host.docker.internal:8081. No sidecar overlay is needed.
 
   // Flatten into compose args
   return files.flatMap((f) => ['-f', f]);
@@ -2914,7 +2914,7 @@ const VOLUME_LABELS: Record<string, string> = {
 };
 
 /**
- * Get info about all TranscriptionSuite Docker volumes.
+ * Get information about the Docker volumes owned by the Seminar edition.
  */
 async function getVolumes(): Promise<VolumeInfo[]> {
   const names = Object.values(VOLUME_NAMES);
@@ -4304,7 +4304,7 @@ async function checkModelsCached(modelIds: string[]): Promise<Record<string, Mod
   const hubIds = modelIds.filter((id) => !isGgmlFileName(id));
 
   // On vulkan-wsl2 the GGML models are consumed by the native whisper-server.exe
-  // and live on the Windows host (%APPDATA%\TranscriptionSuite\whisper-models),
+  // and live on the Windows host under %APPDATA%\TranscriptionSuite Seminar\whisper-models.
   // NOT in the Docker volume. Check the host dir there. The Linux `vulkan` path
   // still keeps GGML files in the container `/models/` volume.
   if (readRuntimeProfileFromStore() === 'vulkan-wsl2') {

@@ -165,7 +165,7 @@ export function buildGhcrUrlsForRepo(imageRepo: string): GhcrUrls {
   };
 }
 
-export const CONTAINER_NAME = 'transcriptionsuite-container';
+export const CONTAINER_NAME = 'transcriptionsuite-seminar-container';
 
 /** Host-side path to the startup events file (set during startContainer). */
 let _startupEventsFilePath: string | null = null;
@@ -754,7 +754,7 @@ function resolveComposeDir(): string {
     ? path.join(process.resourcesPath, 'docker')
     : path.resolve(__dirname, '../../server/docker');
 
-  const userDataDir = path.join(app.getPath('appData'), 'TranscriptionSuite');
+  const userDataDir = path.join(app.getPath('appData'), 'TranscriptionSuite Seminar');
   app.setPath('userData', userDataDir);
   const writableDir = path.join(userDataDir, 'docker');
 
@@ -849,9 +849,9 @@ export function resolveEffectiveRuntimeProfile(
 }
 
 const VOLUME_NAMES = {
-  data: 'transcriptionsuite-data',
-  models: 'transcriptionsuite-models',
-  runtime: 'transcriptionsuite-runtime',
+  data: 'transcriptionsuite-seminar-data',
+  models: 'transcriptionsuite-seminar-models',
+  runtime: 'transcriptionsuite-seminar-runtime',
 } as const;
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -989,7 +989,7 @@ function readRemoteTlsProfile(): RemoteTlsProfile {
 }
 
 /** Default server port — must match dashboard/src/config/store.ts::DEFAULT_SERVER_PORT */
-const DEFAULT_SERVER_PORT = 9786;
+const DEFAULT_SERVER_PORT = 9796;
 
 /**
  * Read the configured server port from the electron-store JSON on disk.
@@ -1527,7 +1527,7 @@ export function composeFileArgs(
   // vulkan-wsl2: whisper-server.exe runs natively on Windows (no AVX2 in the
   // host CPU means the containerised whisper-server cannot start).  Docker only
   // handles the main transcription backend; it reaches the native exe via
-  // host.docker.internal:8080.  No sidecar overlay needed.
+  // host.docker.internal:8081.  No sidecar overlay needed.
 
   // Flatten into compose args
   return files.flatMap((f) => ['-f', f]);
@@ -2694,10 +2694,10 @@ async function startContainer(options: StartContainerOptions): Promise<string> {
   if (runtimeProfile === 'vulkan' || runtimeProfile === 'vulkan-wsl2') {
     let serverUrl: string;
     if (runtimeProfile === 'vulkan-wsl2') {
-      serverUrl = 'http://host.docker.internal:8080';
+      serverUrl = 'http://host.docker.internal:8081';
     } else {
       serverUrl =
-        process.platform === 'linux' ? 'http://localhost:8080' : 'http://whisper-server:8080';
+        process.platform === 'linux' ? 'http://localhost:8081' : 'http://whisper-server :8081';
     }
     composeEnv['WHISPERCPP_SERVER_URL'] = serverUrl;
     envUpdates['WHISPERCPP_SERVER_URL'] = serverUrl;
@@ -2782,12 +2782,12 @@ async function startContainer(options: StartContainerOptions): Promise<string> {
   rotateServerLog();
 
   // vulkan-wsl2: launch native whisper-server.exe before docker compose so the
-  // backend can reach it at host.docker.internal:8080 as soon as it starts.
+  // backend can reach it at host.docker.internal:8081 as soon as it starts.
   if (runtimeProfile === 'vulkan-wsl2') {
     const portFree = await isPort8080Free();
     if (!portFree) {
       throw new Error(
-        'Port 8080 is already in use by another process. ' + 'Free port 8080 and try again.',
+        'Port 8080 is already in use by another process. ' + 'Free port 8081 and try again.',
       );
     }
     await killExistingWhisperServer();
@@ -3745,14 +3745,14 @@ async function checkGpu(): Promise<{
   // for the dzn-era meaning of `vulkan-wsl2` (Mesa-on-D3D12 inside a sidecar).
   // The 2026-05-14 brainstorm pivoted the profile's implementation to launch
   // native `whisper-server.exe` on the Windows host (see `launchWhisperServerNative`)
-  // and reach it from the backend via `host.docker.internal:8080`. That path
+  // and reach it from the backend via `host.docker.internal:8081`. That path
   // does NOT consume /dev/dxg or the WSL UMD bundle, so the probe was testing
   // preconditions the actual code path no longer needs — yet still blocked the
   // UI option behind a manual `docker pull alpine:3` step.
   //
   // For now we just expose the profile to every Windows user and let the
   // native preflight at `dockerManager.ts` line ~2080 catch the real failure
-  // modes (missing `whisper-server.exe`, port 8080 in use, etc.). A future
+  // modes (missing `whisper-server.exe`, port 8081 in use, etc.). A future
   // pass can replace this with a Vulkan-ICD registry check if needed.
   let wslSupport: WslSupport | undefined;
   if (process.platform === 'win32') {
@@ -3817,7 +3817,7 @@ let _whisperServerCurrentModel: string | null = null;
 
 /**
  * How long to wait for a freshly relaunched whisper-server.exe to start
- * listening on :8080 before returning. This only covers the process/socket
+ * listening on  :8081 before returning. This only covers the process/socket
  * coming up — the backend separately waits for the model to finish loading onto
  * the GPU (`_wait_for_sidecar_ready`), so we don't need to block that long here.
  */
@@ -3843,7 +3843,7 @@ async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): P
   }
 }
 
-/** Poll until whisper-server.exe is accepting connections on :8080, or timeout. */
+/** Poll until whisper-server.exe is accepting connections on  :8081, or timeout. */
 async function waitForWhisperServerListening(): Promise<void> {
   const deadline = Date.now() + WHISPER_RELAUNCH_LISTEN_TIMEOUT_MS;
   while (Date.now() < deadline) {
@@ -3851,7 +3851,7 @@ async function waitForWhisperServerListening(): Promise<void> {
     await new Promise((r) => setTimeout(r, WHISPER_RELAUNCH_LISTEN_POLL_MS));
   }
   console.warn(
-    '[DockerManager] whisper-server.exe not listening on :8080 after relaunch wait; ' +
+    '[DockerManager] whisper-server.exe not listening on  :8081 after relaunch wait; ' +
       'continuing anyway (backend has its own readiness wait).',
   );
 }
@@ -3955,21 +3955,21 @@ function getWhisperServerExePath(): string {
 }
 
 function getWhisperServerPidPath(): string {
-  return path.join(app.getPath('appData'), 'TranscriptionSuite', 'whisper-server.pid');
+  return path.join(app.getPath('appData'), 'TranscriptionSuite Seminar', 'whisper-server.pid');
 }
 
 function getWhisperModelsDir(): string {
-  return path.join(app.getPath('appData'), 'TranscriptionSuite', 'whisper-models');
+  return path.join(app.getPath('appData'), 'TranscriptionSuite Seminar', 'whisper-models');
 }
 
 /**
- * Returns true if nothing is listening on localhost:8080.
+ * Returns true if nothing is listening on localhost:8081.
  */
 async function isPort8080Free(): Promise<boolean> {
   return new Promise((resolve) => {
     // Dynamic import keeps `net` out of the module-level scope.
     import('net').then(({ createConnection }) => {
-      const socket = createConnection({ host: '127.0.0.1', port: 8080 });
+      const socket = createConnection({ host: '127.0.0.1', port: 8081 });
       socket.once('connect', () => {
         socket.destroy();
         resolve(false); // something is already listening
@@ -4127,7 +4127,7 @@ async function downloadGgmlModelToHost(fileName: string): Promise<void> {
  */
 async function launchWhisperServerNative(modelPath: string): Promise<void> {
   const exePath = getWhisperServerExePath();
-  const child = spawn(exePath, ['--model', modelPath, '--host', '0.0.0.0', '--port', '8080'], {
+  const child = spawn(exePath, ['--model', modelPath, '--host', '0.0.0.0', '--port', '8081'], {
     detached: true,
     stdio: 'ignore',
   });

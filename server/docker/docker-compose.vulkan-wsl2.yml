@@ -1,4 +1,5 @@
-# Vulkan-WSL2 sidecar overlay — whisper.cpp with Vulkan-on-D3D12 (dzn) GPU
+# TranscriptionSuite Seminar — Vulkan-WSL2 sidecar overlay
+# whisper.cpp with Vulkan-on-D3D12 (dzn) GPU
 # acceleration on Windows + Docker Desktop with the WSL2 backend (GH-101
 # follow-up).
 #
@@ -29,8 +30,8 @@
 #       -f docker-compose.desktop-vm.yml \
 #       -f docker-compose.vulkan-wsl2.yml up -d
 #
-# The dashboard's compose-file selection (dockerManager.ts::composeFileArgs)
-# routes the 'vulkan-wsl2' runtime profile to this overlay automatically.
+# The Seminar dashboard selects this overlay automatically for the 'vulkan-wsl2'
+# runtime profile. The host mapping 8081:8080 is intentionally dedicated to Seminar.
 
 services:
   whisper-server:

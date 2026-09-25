@@ -2697,7 +2697,7 @@ async function startContainer(options: StartContainerOptions): Promise<string> {
       serverUrl = 'http://host.docker.internal:8081';
     } else {
       serverUrl =
-        process.platform === 'linux' ? 'http://localhost:8081' : 'http://whisper-server :8081';
+        process.platform === 'linux' ? 'http://localhost:8080' : 'http://whisper-server:8080';
     }
     composeEnv['WHISPERCPP_SERVER_URL'] = serverUrl;
     envUpdates['WHISPERCPP_SERVER_URL'] = serverUrl;
@@ -2784,7 +2784,7 @@ async function startContainer(options: StartContainerOptions): Promise<string> {
   // vulkan-wsl2: launch native whisper-server.exe before docker compose so the
   // backend can reach it at host.docker.internal:8081 as soon as it starts.
   if (runtimeProfile === 'vulkan-wsl2') {
-    const portFree = await isPort8080Free();
+    const portFree = await isPort8081Free();
     if (!portFree) {
       throw new Error(
         'Port 8080 is already in use by another process. ' + 'Free port 8081 and try again.',
@@ -3847,7 +3847,7 @@ async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): P
 async function waitForWhisperServerListening(): Promise<void> {
   const deadline = Date.now() + WHISPER_RELAUNCH_LISTEN_TIMEOUT_MS;
   while (Date.now() < deadline) {
-    if (!(await isPort8080Free())) return; // something is listening → up
+    if (!(await isPort8081Free())) return; // something is listening → up
     await new Promise((r) => setTimeout(r, WHISPER_RELAUNCH_LISTEN_POLL_MS));
   }
   console.warn(
@@ -3948,7 +3948,7 @@ export async function switchWhisperServerModel(
 function getWhisperServerExePath(): string {
   return path.join(
     app.getPath('appData'),
-    'TranscriptionSuite',
+    'TranscriptionSuite Seminar',
     'whisper-server',
     'whisper-server.exe',
   );
@@ -3965,7 +3965,7 @@ function getWhisperModelsDir(): string {
 /**
  * Returns true if nothing is listening on localhost:8081.
  */
-async function isPort8080Free(): Promise<boolean> {
+async function isPort8081Free(): Promise<boolean> {
   return new Promise((resolve) => {
     // Dynamic import keeps `net` out of the module-level scope.
     import('net').then(({ createConnection }) => {

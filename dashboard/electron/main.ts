@@ -116,10 +116,9 @@ if (process.platform === 'linux') {
 }
 // Windows: native WASAPI loopback — no flags needed.
 
-// Ensure all Electron paths use PascalCase: ~/.config/TranscriptionSuite (not lowercase).
-// Both 'userData' AND 'crashDumps' must be set explicitly — Electron derives them
-// independently, and 'crashDumps' defaults to ~/.config/{package.name}/Crashpad (which
-// would be lowercase because npm requires lowercase package names).
+// Seminar edition: keep Electron's persistent paths isolated from the stable TranscriptionSuite installation.
+// Both 'userData' AND 'crashDumps' are set explicitly because Electron derives them independently.
+// The dedicated PascalCase directory also keeps Seminar's config, logs, cache and Crashpad data separate.
 app.setPath('userData', path.join(app.getPath('appData'), 'TranscriptionSuite Seminar'));
 app.setPath('crashDumps', path.join(app.getPath('appData'), 'TranscriptionSuite Seminar', 'Crashpad'));
 
@@ -564,7 +563,7 @@ const store = new Store({
   },
 });
 
-// Migrate any explicitly-stored old port (8000) to the current default (9786).
+// Migrate any explicitly-stored legacy port (8000) to the Seminar edition's default port (9796).
 // store.has() guards against matching the electron-store default for unset keys.
 for (const key of ['connection.port', 'server.port'] as const) {
   if (store.has(key) && store.get(key) === 8000) store.set(key, 9796);

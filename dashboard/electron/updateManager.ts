@@ -101,7 +101,7 @@ export interface UpdateAvailablePayload {
 // ─── Constants ──────────────────────────────────────────────────────────────
 
 const GITHUB_RELEASES_URL =
-  'https://api.github.com/repos/homelab-00/TranscriptionSuite/releases/latest';
+  'https://api.github.com/repos/Drworm82/TranscriptionSuite-Seminar/releases/latest';
 
 // GHCR URLs for the server-image channel are resolved per-check from
 // `server.useLegacyGpu` (Issue #83). A legacy user should see legacy updates
@@ -560,7 +560,7 @@ export class UpdateManager {
     }
 
     const notification = new Notification({
-      title: 'TranscriptionSuite Update Available',
+      title: 'TranscriptionSuite Seminar Update Available',
       body: lines.join('\n'),
       silent: true,
     });

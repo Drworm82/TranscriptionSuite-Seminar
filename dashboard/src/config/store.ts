@@ -116,7 +116,7 @@ export interface ClientConfig {
 }
 
 /** Default server port — single source of truth for all client-side defaults. */
-export const DEFAULT_SERVER_PORT = 9786;
+export const DEFAULT_SERVER_PORT = 9796;
 
 const DEFAULT_CONFIG: ClientConfig = {
   server: {

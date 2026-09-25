@@ -60,7 +60,7 @@ services:
       # Bound read-only so the container cannot tamper with WSL host libs.
       - /usr/lib/wsl:/usr/lib/wsl:ro
     ports:
-      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:8081:8080"
     devices:
       # WSL2 GPU paravirtualization device. Docker Desktop does not auto-bind
       # this for non-NVIDIA paths; we must request it explicitly.

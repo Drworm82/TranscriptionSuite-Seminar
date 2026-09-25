@@ -72,7 +72,7 @@ services:
     # `transcriptionsuite-server` and the legacy-GPU `transcriptionsuite-server-legacy`
     # repo (Issue #83). The default keeps the existing behaviour for unchanged callers.
     image: ${IMAGE_REPO:-ghcr.io/homelab-00/transcriptionsuite-server}:${TAG:-latest}
-    container_name: transcriptionsuite-container
+    container_name: transcriptionsuite-seminar-container
     
     # Environment variables
     environment:
@@ -186,8 +186,8 @@ services:
 
 volumes:
   transcription-data:
-    name: transcriptionsuite-data
+    name: transcriptionsuite-seminar-data
   huggingface-models:
-    name: transcriptionsuite-models
+    name: transcriptionsuite-seminar-models
   runtime-deps:
-    name: transcriptionsuite-runtime
+    name: transcriptionsuite-seminar-runtime

@@ -1,5 +1,7 @@
-# TranscriptionSuite Docker Compose — Base Configuration
-# ======================================================
+# TranscriptionSuite Seminar Docker Compose — Base Configuration
+# ==============================================================
+# Seminar edition: this compose stack uses dedicated container and volume names
+# so it can run alongside the stable TranscriptionSuite installation.
 # This is the base compose file with common service definition, volumes, and env.
 # It is combined with platform and runtime overlays by the Electron dockerManager.
 #
@@ -42,14 +44,14 @@
 #   Mount your local config directory to enable custom settings and persistent logs:
 #
 #   Linux:
-#     USER_CONFIG_DIR=~/.config/TranscriptionSuite docker compose up -d
+#     USER_CONFIG_DIR=~/.config/TranscriptionSuite Seminar docker compose up -d
 #
 #   Windows (PowerShell):
-#     $env:USER_CONFIG_DIR="$env:USERPROFILE\Documents\TranscriptionSuite"
+#     $env:USER_CONFIG_DIR="$env:APPDATA\TranscriptionSuite Seminar"
 #     docker compose up -d
 #
 #   macOS:
-#     USER_CONFIG_DIR=~/Library/Application\ Support/TranscriptionSuite docker compose up -d
+#     USER_CONFIG_DIR=~/Library/Application\ Support/TranscriptionSuite Seminar docker compose up -d
 #
 #   To customize settings, copy config.yaml from the repo to your USER_CONFIG_DIR
 #   and edit as needed. The server will use your custom config instead of defaults.
@@ -68,6 +70,8 @@ services:
         PYTORCH_VARIANT: ${PYTORCH_VARIANT:-cu129}
         BASE_IMAGE: ${BASE_IMAGE:-ubuntu:24.04}
         UV_PYTHON_BIN: ${UV_PYTHON_BIN:-/usr/bin/python3.13}
+    # Seminar still consumes the upstream server image repository; application data,
+    # container identity and persistent volumes are isolated below.
     # Image repo is templated so the dashboard can switch between the default
     # `transcriptionsuite-server` and the legacy-GPU `transcriptionsuite-server-legacy`
     # repo (Issue #83). The default keeps the existing behaviour for unchanged callers.
@@ -78,7 +82,7 @@ services:
     environment:
       - DATA_DIR=/data
       - SERVER_HOST=0.0.0.0
-      - SERVER_PORT=${SERVER_PORT:-9786}
+      - SERVER_PORT=${SERVER_PORT:-9796}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       # HuggingFace token for downloading models (optional)
       - HF_TOKEN=${HUGGINGFACE_TOKEN:-}
@@ -149,8 +153,8 @@ services:
       # User config directory (optional - for custom config.yaml and logs)
       # Set USER_CONFIG_DIR to mount your local config directory:
       #   Linux: USER_CONFIG_DIR=~/.config/TranscriptionSuite
-      #   Windows: USER_CONFIG_DIR=$HOME/Documents/TranscriptionSuite
-      #   macOS: USER_CONFIG_DIR=~/Library/Application Support/TranscriptionSuite
+      #   Windows: USER_CONFIG_DIR=$env:APPDATA/TranscriptionSuite Seminar
+      #   macOS: USER_CONFIG_DIR=~/Library/Application Support/TranscriptionSuite Seminar
       - ${USER_CONFIG_DIR:-./.empty}:/user-config
       # TLS certificates the server PRESENTS for remote access (its own HTTPS listener).
       # This is not a trust anchor — see EXTRA_CA_CERTS_DIR below for that.
@@ -161,10 +165,10 @@ services:
       # scanner re-signs traffic; the entrypoint installs every *.crt/*.pem/*.cer found
       # here into the container trust store. Docker does not propagate the host's trust
       # store into containers, so without this the re-signed cert is always rejected.
-      #   Windows: EXTRA_CA_CERTS_DIR=C:\Users\<you>\AppData\Roaming\TranscriptionSuite\ca
+      #   Windows: EXTRA_CA_CERTS_DIR=C:\Users\<you>\AppData\Roaming\TranscriptionSuite Seminar\ca
       #     (write the full path: %VARS% like %APPDATA% are NOT expanded in a .env file;
       #     a literal %APPDATA% aborts startup with "refers to undefined volume %APPDATA%\...")
-      #   Linux/macOS: EXTRA_CA_CERTS_DIR=~/.config/TranscriptionSuite/ca
+      #   Linux/macOS: EXTRA_CA_CERTS_DIR=~/.config/TranscriptionSuite Seminar/ca
       # Unset mounts an empty placeholder, which is a no-op.
       - ${EXTRA_CA_CERTS_DIR:-./.empty}:/ca-trust:ro
       # Startup events file (bind-mounted for Electron fs.watch access)
@@ -178,7 +182,7 @@ services:
 
     # Health check - works with both HTTP and HTTPS modes
     healthcheck:
-      test: ["CMD", "sh", "-c", "if [ \"$${TLS_ENABLED:-false}\" = \"true\" ]; then curl -f -k https://localhost:$${SERVER_PORT:-9786}/health; else curl -f http://localhost:$${SERVER_PORT:-9786}/health; fi"]
+      test: ["CMD", "sh", "-c", "if [ \"$${TLS_ENABLED:-false}\" = \"true\" ]; then curl -f -k https://localhost:$${SERVER_PORT:-9796}/health; else curl -f http://localhost:$${SERVER_PORT:-9786}/health; fi"]
       interval: 30s
       timeout: 10s
       retries: 3

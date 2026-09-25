@@ -16,8 +16,8 @@ import * as fs from 'node:fs';
 export type AppVariant =
   'mac-metal' | 'mac-standard-arm64' | 'mac-standard-x64' | 'linux' | 'windows';
 
-const PRODUCT_NAME = 'TranscriptionSuite';
-const REPO_PATH = 'homelab-00/TranscriptionSuite';
+const PRODUCT_NAME = 'TranscriptionSuite Seminar';
+const REPO_PATH = 'Drworm82/TranscriptionSuite-Seminar';
 
 export interface VariantProbe {
   platform: NodeJS.Platform;

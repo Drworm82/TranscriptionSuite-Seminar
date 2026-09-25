@@ -26,7 +26,7 @@
  * exposure either way — the origin is always github.com.
  */
 export function buildReleaseUrl(version: string | null): string {
-  const base = 'https://github.com/homelab-00/TranscriptionSuite/releases';
+  const base = 'https://github.com/Drworm82/TranscriptionSuite-Seminar/releases';
   if (version && version.length > 0) {
     const stripped = version.replace(/^v/i, '');
     return `${base}/tag/v${stripped}`;

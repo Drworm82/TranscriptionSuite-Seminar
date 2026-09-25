@@ -120,8 +120,8 @@ if (process.platform === 'linux') {
 // Both 'userData' AND 'crashDumps' must be set explicitly — Electron derives them
 // independently, and 'crashDumps' defaults to ~/.config/{package.name}/Crashpad (which
 // would be lowercase because npm requires lowercase package names).
-app.setPath('userData', path.join(app.getPath('appData'), 'TranscriptionSuite'));
-app.setPath('crashDumps', path.join(app.getPath('appData'), 'TranscriptionSuite', 'Crashpad'));
+app.setPath('userData', path.join(app.getPath('appData'), 'TranscriptionSuite Seminar'));
+app.setPath('crashDumps', path.join(app.getPath('appData'), 'TranscriptionSuite Seminar', 'Crashpad'));
 
 // Session notification log - wiped at boot and on quit (semi-persistent).
 const notificationLog = new NotificationLog(app.getPath('userData'));
@@ -479,7 +479,7 @@ const store = new Store({
     'connection.remoteProfile': 'tailscale',
     'connection.useRemote': false,
     'connection.authToken': '',
-    'connection.port': 9786,
+    'connection.port': 9796,
     'connection.useHttps': false,
     'session.audioSource': 'mic',
     'session.micDevice': 'Default Microphone',
@@ -519,7 +519,7 @@ const store = new Store({
        are migrated client-side at boot. Blur stays ON by default (cheap). */
     'ui.idleAnimationsEnabled': false,
     'server.host': 'localhost',
-    'server.port': 9786,
+    'server.port': 9796,
     'server.https': false,
     'server.hfToken': '',
     'server.hfTokenDecision': 'unset',
@@ -567,7 +567,7 @@ const store = new Store({
 // Migrate any explicitly-stored old port (8000) to the current default (9786).
 // store.has() guards against matching the electron-store default for unset keys.
 for (const key of ['connection.port', 'server.port'] as const) {
-  if (store.has(key) && store.get(key) === 8000) store.set(key, 9786);
+  if (store.has(key) && store.get(key) === 8000) store.set(key, 9796);
 }
 
 // ─── Tray Manager ───────────────────────────────────────────────────────────
@@ -1067,7 +1067,7 @@ ipcMain.handle('app:removeConfigAndCache', async () => {
     }
     // Linux: the XDG_CACHE_HOME default set above is already correct.
   }
-  const externalCacheDir = path.join(cacheBaseDir, 'TranscriptionSuite');
+  const externalCacheDir = path.join(cacheBaseDir, 'TranscriptionSuite Seminar');
 
   // Clear Chromium/Electron session data before deleting the directories so that
   // in-memory state is wiped and Electron does not immediately flush stale data
@@ -1572,7 +1572,7 @@ ipcMain.handle('audio:createMonitorLoopback', async (_e, sinkName: string) =>
       'module-remap-source',
       `master=${sinkName}.monitor`,
       'source_name=tsuite_loopback',
-      'source_properties=device.description=TranscriptionSuite_Loopback',
+      'source_properties=device.description=TranscriptionSuite_Seminar_Loopback',
     ]);
     loopbackModuleId = parseInt(stdout.trim(), 10);
 
@@ -2458,7 +2458,7 @@ app.whenReady().then(async () => {
     if (shouldPromptRestore && cached) {
       const choice = dialog.showMessageBoxSync({
         type: 'warning',
-        title: 'TranscriptionSuite — repeated launch failures',
+        title: 'TranscriptionSuite Seminar — repeated launch failures',
         message: `Dashboard v${app.getVersion()} has failed to launch ${count} times in a row.`,
         detail:
           `A cached copy of v${cached.version} is available.\n\n` +
@@ -2501,7 +2501,7 @@ app.whenReady().then(async () => {
   const runtimeProfile = store.get('server.runtimeProfile') as string;
   const mlxDesiredRunning = store.get('server.mlxDesiredRunning') === true;
   if (runtimeProfile === 'metal' && mlxDesiredRunning) {
-    const port = (store.get('server.port') as number) ?? 9786;
+    const port = (store.get('server.port') as number) ?? 9796;
     const hfToken = (store.get('server.hfToken') as string) || undefined;
     const mainTranscriberModel =
       (store.get('server.mainModelSelection') as string) || 'mlx-community/whisper-small-asr-fp16';

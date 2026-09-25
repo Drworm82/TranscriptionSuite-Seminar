@@ -1445,7 +1445,13 @@ export const ServerView: React.FC<ServerViewProps> = ({
       const tags = docker.images
         .map((i) => ({ tag: i.tag, created: i.created }))
         .sort((a, b) => compareVersionTags(a.tag, b.tag));
-      const def = tags.find((rt) => !/rc/i.test(rt.tag))?.tag ?? tags[0]?.tag ?? 'latest';
+      const def =
+  (localTagSet.has('patched-1.3.10') && tags.some((rt) => rt.tag === 'patched-1.3.10')
+    ? 'patched-1.3.10'
+    : undefined) ??
+  tags.find((rt) => !/rc/i.test(rt.tag))?.tag ??
+  tags[0]?.tag ??
+  'latest';
       return { mergedTags: tags, defaultImageTag: def };
     }
 
@@ -1459,7 +1465,13 @@ export const ServerView: React.FC<ServerViewProps> = ({
     const tags = [...docker.remoteTags, ...localOnly].sort((a, b) =>
       compareVersionTags(a.tag, b.tag),
     );
-    const def = tags.find((rt) => !/rc/i.test(rt.tag))?.tag ?? tags[0]?.tag ?? 'latest';
+    const def =
+  (localTagSet.has('patched-1.3.10') && tags.some((rt) => rt.tag === 'patched-1.3.10')
+    ? 'patched-1.3.10'
+    : undefined) ??
+  tags.find((rt) => !/rc/i.test(rt.tag))?.tag ??
+  tags[0]?.tag ??
+  'latest';
     return { mergedTags: tags, defaultImageTag: def };
   }, [hasRemoteTags, docker.remoteTags, docker.images]);
 

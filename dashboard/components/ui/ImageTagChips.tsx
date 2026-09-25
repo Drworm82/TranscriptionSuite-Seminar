@@ -9,7 +9,7 @@ interface ImageTagChipsProps {
   remoteTags: RemoteTag[];
   /** Set of tag strings that are downloaded locally. */
   localTags: Set<string>;
-  /** Map of local tag → Docker created date string. */
+  /** Map of local tag -> Docker created date string. */
   localDates: Map<string, string>;
   /** Currently selected tag string. */
   value: string;
@@ -41,8 +41,16 @@ export const ImageTagChips: React.FC<ImageTagChipsProps> = ({
   const { stableChips, rcTags, olderTags, hasOverflow } = useMemo(() => {
     const stable = remoteTags.filter((rt) => {
       const p = parseVersionTag(rt.tag);
-      return p && !p.isRC;
+
+      // Local development/custom tags are valid selectable images even
+      // when they do not follow the published semver format.
+      if (!p) {
+        return localTags.has(rt.tag);
+      }
+
+      return !p.isRC;
     });
+
     const chips = stable.slice(0, MAIN_CHIP_COUNT);
     const older = stable.slice(MAIN_CHIP_COUNT);
 
@@ -63,9 +71,9 @@ export const ImageTagChips: React.FC<ImageTagChipsProps> = ({
       olderTags: older,
       hasOverflow: rc.length > 0 || older.length > 0,
     };
-  }, [remoteTags]);
+  }, [remoteTags, localTags]);
 
-  /** Resolve a display date for a tag — prefer GHCR date, fallback to local Docker date. */
+  /** Resolve a display date for a tag - prefer GHCR date, fallback to local Docker date. */
   const getDate = (rt: RemoteTag): string | null =>
     formatDateDMY(rt.created) ?? formatDateDMY(localDates.get(rt.tag) ?? null);
 
@@ -108,7 +116,7 @@ export const ImageTagChips: React.FC<ImageTagChipsProps> = ({
   return (
     // flex-wrap so the chips reflow onto additional rows instead of
     // overflowing their container (each chip is min-w-[5rem] and cannot
-    // shrink) — prevents the chip row from spilling over the "Remove Image"
+    // shrink) - prevents the chip row from spilling over the "Remove Image"
     // button at medium widths and being clipped at the card edge when narrow.
     <div className="flex flex-wrap items-center gap-1.5">
       {stableChips.map((rt) => {

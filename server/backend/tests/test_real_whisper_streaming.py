@@ -17,6 +17,12 @@ from pathlib import Path
 from urllib import request
 
 
+# Allow running this file directly from server/backend on Windows.
+BACKEND_ROOT = Path(__file__).resolve().parents[1]
+if str(BACKEND_ROOT) not in sys.path:
+    sys.path.insert(0, str(BACKEND_ROOT))
+
+
 SERVER_URL = "http://127.0.0.1:8081/inference"
 DEFAULT_AUDIO = Path(r"G:\Descargas\diplomado-test-20s.wav")
 SAMPLE_RATE = 16000
@@ -168,8 +174,6 @@ def main() -> int:
             frame_count,
         )
 
-        # Do not process a final fragment shorter than the configured
-        # minimum useful window. The 20s test therefore uses full windows.
         if window_end_sample - window_start_sample < int(0.5 * rate):
             break
 
@@ -180,7 +184,6 @@ def main() -> int:
         end_byte = window_end_sample * sample_width
         window_pcm = pcm[start_byte:end_byte]
 
-        # Build a valid WAV container around the PCM window.
         import io
 
         buffer = io.BytesIO()

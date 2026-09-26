@@ -97,11 +97,13 @@ def extract_words(result: dict, window_start: float) -> list[tuple[str, float, f
 
     for segment in result.get("segments", []) or []:
         for word in segment.get("words", []) or []:
-            text = str(word.get("word", "")).strip()
+            # Preserve Whisper's leading whitespace. The reconstruction
+            # algorithm uses it to recover word boundaries.
+            text = str(word.get("word", ""))
             start = word.get("start")
             end = word.get("end")
 
-            if not text or start is None or end is None:
+            if not text.strip() or start is None or end is None:
                 continue
 
             # Whisper timestamps are relative to this window.

@@ -161,9 +161,11 @@ def main() -> int:
         WhisperWindow,
     )
 
+    # A 2.0s window with a 0.6s stride has only 1.4s of overlap.
+    # Five matching words is therefore too strict for short speech windows.
     reconstructor = IncrementalWhisperReconstructor(
         overlap_seconds=3.0,
-        minimum_matches=5,
+        minimum_matches=2,
     )
 
     timings: list[float] = []
